@@ -2,16 +2,10 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
-    public enum PlayerState
-    {
-        Idle,    // Простаивание
-        Jumping, // Прыжок
-        Runing,  // Бег
-        Hiting   // Урон
-    }
-
     [SerializeField] private float speedMove = 20f;
     [SerializeField] private float speedJump = 10f;
+    [SerializeField] private float rayDistance = 1.1f;
+    public LayerMask groundLayer;
     private Rigidbody2D rb;
     private PlayerState state;
     private bool lookRight;
@@ -42,45 +36,65 @@ public class MovementController : MonoBehaviour
         // transform.Translate(new Vector2(Input.GetAxis("Horizontal"), 0) * speedMove * Time.deltaTime);
         //rb.AddForce(new Vector2(Input.GetAxis("Horizontal") * speedMove, 0));
 
-        if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.1)
+        // runing logic
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
         {
-            rb.linearVelocityX = Input.GetAxis("Horizontal") * speedMove;
-            if(state == PlayerState.Idle)
-                state = PlayerState.Runing;
-
-            if (
-                (Input.GetAxis("Horizontal") > 0 && !lookRight) || 
-                (Input.GetAxis("Horizontal") < 0 && lookRight)
-               )
-                flip();
+           Run();
         }
-        else if (state != PlayerState.Jumping && Input.GetKey(KeyCode.Space))
+        // idle logic
+        else if (!Input.anyKey && state != PlayerState.Jumping)
         {
-            rb.AddForce(new Vector2(0, speedJump), ForceMode2D.Impulse);
-            state = PlayerState.Jumping;
+            Idle();
         }
-        else if (Mathf.Abs(Input.GetAxis("Horizontal")) <= 0.1 && state == PlayerState.Runing)
+        // jumpic logic
+        if (state != PlayerState.Jumping && Input.GetKey(KeyCode.Space))
         {
-            state = PlayerState.Idle;
+           Jump();
         }
 
-        Debug.Log(state);
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (state == PlayerState.Jumping)
+        if (IsGrounded() && rb.linearVelocityY <= 0.1)
         {
-            if (Mathf.Abs(Input.GetAxis("Horizontal")) <= 0.1)
-                state = PlayerState.Runing;
-            else
+            if (!Input.anyKey)
                 state = PlayerState.Idle;
+            else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+                state = PlayerState.Runing;
         }
     }
 
-    private void flip()
+
+    private void Flip()
     {
         transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
         lookRight = !lookRight;
     }
+
+    private bool IsGrounded()
+    {
+        return Physics2D.Raycast(transform.position, Vector3.down, rayDistance, groundLayer); 
+    }
+
+    private void Jump()
+    {
+        rb.AddForce(new Vector2(0, speedJump), ForceMode2D.Impulse);
+        state = PlayerState.Jumping;
+    }
+
+    private void Run()
+    {
+        rb.linearVelocityX = Input.GetAxis("Horizontal") * speedMove;
+        if (state != PlayerState.Jumping)
+            state = PlayerState.Runing;
+        if (
+            (Input.GetAxis("Horizontal") > 0 && !lookRight) ||
+            (Input.GetAxis("Horizontal") < 0 && lookRight)
+           )
+            Flip();
+    }
+
+    private void Idle()
+    {
+        rb.linearVelocityX = 0;
+        state = PlayerState.Idle;
+    }
+
 }

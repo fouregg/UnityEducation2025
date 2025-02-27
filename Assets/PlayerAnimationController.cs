@@ -2,9 +2,11 @@ using UnityEngine;
 
 public class PlayerAnimationController : MonoBehaviour
 {
+
     private Animator animator;
     private MovementController movementController;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private PlayerState prevState;
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -16,18 +18,20 @@ public class PlayerAnimationController : MonoBehaviour
     {
         switch (movementController.State) 
         {
-            case (MovementController.PlayerState.Idle):
-                animator.SetTrigger("isIdle");
+            case (PlayerState.Runing):
+                if (prevState != PlayerState.Runing)
+                    animator.SetTrigger("isRun");
                 break;
-            case (MovementController.PlayerState.Runing):
-                animator.SetTrigger("isRun");
+            case (PlayerState.Idle):
+                if (prevState != PlayerState.Idle)
+                    animator.SetTrigger("isIdle");
                 break;
-            case (MovementController.PlayerState.Jumping):
-                animator.SetTrigger("isJump");
-                Debug.Log(movementController.Rb.linearVelocityY);
+            case (PlayerState.Jumping):
+                if (prevState != PlayerState.Jumping)
+                    animator.SetTrigger("isJump");
                 animator.SetFloat("jumpSpeed", movementController.Rb.linearVelocityY);
                 break;
         }
-
+        prevState = movementController.State;
     }
 }
