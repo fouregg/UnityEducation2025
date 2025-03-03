@@ -6,6 +6,7 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float speedJump = 10f;
     [SerializeField] private float rayDistance = 1.1f;
     public LayerMask groundLayer;
+    private SpriteRenderer pl;
     private Rigidbody2D rb;
     private PlayerState state;
     private bool lookRight;
@@ -20,6 +21,7 @@ public class MovementController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         state = PlayerState.Idle;
         lookRight = true;
+        pl = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -64,12 +66,13 @@ public class MovementController : MonoBehaviour
 
     private void Flip()
     {
-        transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+        pl.flipX = !pl.flipX;
         lookRight = !lookRight;
     }
 
     private bool IsGrounded()
     {
+        Debug.DrawRay(transform.position, Vector3.down * rayDistance, Color.red);
         return Physics2D.Raycast(transform.position, Vector3.down, rayDistance, groundLayer); 
     }
 
