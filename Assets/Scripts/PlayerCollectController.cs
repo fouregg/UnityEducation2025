@@ -15,14 +15,13 @@ public class PlayerCollectController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        tm.SetText("Score: " + score.ToString());
+        tm.SetText("SCORE: " + score.ToString());
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Fruits") 
         {
-            score++;
             StartCoroutine(PlayUntilDestroy(collision.gameObject));
         }
     }
@@ -30,8 +29,9 @@ public class PlayerCollectController : MonoBehaviour
     IEnumerator PlayUntilDestroy(GameObject fruit)
     {
         AudioSource sound = fruit.GetComponent<AudioSource>();
+        score++;
         sound.Play();
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.2f);
         Destroy(fruit);
     }
 }
