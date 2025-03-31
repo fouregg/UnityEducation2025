@@ -5,8 +5,12 @@ public class PlayerAnimationController : MonoBehaviour
 
     private Animator animator;
     private MovementController movementController;
+    private bool playing = true;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private PlayerState prevState;
+
+    public bool Playing { get => playing; set => playing = value; }
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -16,22 +20,30 @@ public class PlayerAnimationController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        switch (movementController.State) 
+        if (playing)
         {
-            case (PlayerState.Runing):
-                if (prevState != PlayerState.Runing)
-                    animator.SetTrigger("isRun");
-                break;
-            case (PlayerState.Idle):
-                if (prevState != PlayerState.Idle)
-                    animator.SetTrigger("isIdle");
-                break;
-            case (PlayerState.Jumping):
-                if (prevState != PlayerState.Jumping)
-                    animator.SetTrigger("isJump");
-                animator.SetFloat("jumpSpeed", movementController.Rb.linearVelocityY);
-                break;
+            animator.enabled = true;
+            switch (movementController.State)
+            {
+                case (PlayerState.Runing):
+                    if (prevState != PlayerState.Runing)
+                        animator.SetTrigger("isRun");
+                    break;
+                case (PlayerState.Idle):
+                    if (prevState != PlayerState.Idle)
+                        animator.SetTrigger("isIdle");
+                    break;
+                case (PlayerState.Jumping):
+                    if (prevState != PlayerState.Jumping)
+                        animator.SetTrigger("isJump");
+                    animator.SetFloat("jumpSpeed", movementController.Rb.linearVelocityY);
+                    break;
+            }
+            prevState = movementController.State;
         }
-        prevState = movementController.State;
+        else
+        {
+            animator.enabled = false;
+        }
     }
 }
