@@ -31,7 +31,7 @@ public class PlayerCheckpointController : MonoBehaviour
             }
         }
 
-        if (collision.gameObject.name == "DeadZone")
+        if ((collision.gameObject.name == "DeadZone") || (collision.gameObject.tag == "Traps"))
             gameObject.transform.position = lastCheckpoint.transform.position + Vector3.up;
     }
 }

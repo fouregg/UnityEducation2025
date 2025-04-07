@@ -5,14 +5,17 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float speedMove = 20f;
     [SerializeField] private float speedJump = 10f;
     [SerializeField] private float rayDistance = 1.1f;
+    private AudioSource soundJump;
     public LayerMask groundLayer;
     private SpriteRenderer pl;
     private Rigidbody2D rb;
     private PlayerState state;
     private bool lookRight;
-
+    private bool playing = true;
     public PlayerState State { get => state; set => state = value; } // Геттер и сеттер в С#
     public Rigidbody2D Rb { get => rb; set => rb = value; }
+    public bool Playing { get => playing; set => playing = value; }
+    public bool LookRight { get => lookRight; set => lookRight = value; }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -22,44 +25,37 @@ public class MovementController : MonoBehaviour
         state = PlayerState.Idle;
         lookRight = true;
         pl = GetComponent<SpriteRenderer>();
+        soundJump = GetComponents<AudioSource>()[0];
     }
 
     // Update is called once per frame
     void Update()
     {
-        /* difficult code
-        if (Input.GetAxis("Horizontal") != 0)
-        {
-            transform.position = new Vector3(transform.position.x + Input.GetAxis("Horizontal") * speedMove * Time.deltaTime, transform.position.y, transform.position.z);
-        }
-        */
-        // transfrom - object of component Transform in Unity, Input.GetAxis(name Axis) - method for get keyInput on keyboard
-        // not correct work for wall
-        // transform.Translate(new Vector2(Input.GetAxis("Horizontal"), 0) * speedMove * Time.deltaTime);
-        //rb.AddForce(new Vector2(Input.GetAxis("Horizontal") * speedMove, 0));
-
-        // runing logic
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
-        {
-           Run();
-        }
-        // idle logic
-        else if (!Input.anyKey && state != PlayerState.Jumping)
-        {
-            Idle();
-        }
+        if (playing)
+        { 
+            // runing logic
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+            {
+                Run();
+            }
+            // idle logic
+            else if (!Input.anyKey && state != PlayerState.Jumping)
+            {
+                Idle();
+            }
         // jumpic logic
-        if (state != PlayerState.Jumping && Input.GetKey(KeyCode.Space))
-        {
-           Jump();
-        }
+            if (state != PlayerState.Jumping && Input.GetKey(KeyCode.Space))
+            {
+                Jump();
+            }
 
-        if (IsGrounded() && rb.linearVelocityY <= 0.1)
-        {
-            if (!Input.anyKey)
-                state = PlayerState.Idle;
-            else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
-                state = PlayerState.Runing;
+            if (IsGrounded() && rb.linearVelocityY <= 0.1)
+            {
+                if (!Input.anyKey)
+                    state = PlayerState.Idle;
+                else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+                    state = PlayerState.Runing;
+            }
         }
     }
 
@@ -80,6 +76,7 @@ public class MovementController : MonoBehaviour
     {
         rb.AddForce(new Vector2(0, speedJump), ForceMode2D.Impulse);
         state = PlayerState.Jumping;
+        soundJump.Play();
     }
 
     private void Run()
