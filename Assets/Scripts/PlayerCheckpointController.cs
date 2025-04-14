@@ -3,6 +3,9 @@ using UnityEngine;
 public class PlayerCheckpointController : MonoBehaviour
 {
     private GameObject lastCheckpoint;
+
+    public GameObject LastCheckpoint { get => lastCheckpoint; set => lastCheckpoint = value; }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -30,8 +33,5 @@ public class PlayerCheckpointController : MonoBehaviour
                 animator.SetTrigger("enable");
             }
         }
-
-        if ((collision.gameObject.name == "DeadZone") || (collision.gameObject.tag == "Traps"))
-            gameObject.transform.position = lastCheckpoint.transform.position + Vector3.up;
     }
 }
