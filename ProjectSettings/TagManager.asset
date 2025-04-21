@@ -7,6 +7,8 @@ TagManager:
   - Fruits
   - Checkpoint
   - Traps
+  - EnemyEnv
+  - Enemy
   layers:
   - Default
   - TransparentFX
